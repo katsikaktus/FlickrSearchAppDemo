@@ -3,7 +3,9 @@ package com.giota.flickrsearchdemoapp
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.giota.flickrsearchdemoapp.ui.FlickrSearchApp
+import com.giota.flickrsearchdemoapp.ui.FlickrSearchViewModel
 import com.giota.flickrsearchdemoapp.ui.theme.FlickrSearchDemoAppTheme
 
 class MainActivity : ComponentActivity() {
@@ -11,7 +13,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             FlickrSearchDemoAppTheme {
-                FlickrSearchApp()
+                val viewModel: FlickrSearchViewModel =
+                    viewModel(factory = FlickrSearchViewModel.Factory)
+                FlickrSearchApp(viewModel)
             }
         }
     }

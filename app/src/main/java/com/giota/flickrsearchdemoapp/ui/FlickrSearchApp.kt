@@ -10,7 +10,9 @@ import com.giota.flickrsearchdemoapp.ui.screens.HomeScreen
 
 
 @Composable
-fun FlickrSearchApp(modifier: Modifier = Modifier) {
+fun FlickrSearchApp(
+    flickrSearchViewModel: FlickrSearchViewModel,
+    modifier: Modifier = Modifier) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
     ) {
@@ -20,7 +22,6 @@ fun FlickrSearchApp(modifier: Modifier = Modifier) {
                 .padding(it),
             color = MaterialTheme.colors.background
         ) {
-            val flickrSearchViewModel: FlickrSearchViewModel = viewModel()
             HomeScreen(
                 flickrSearchUiState = flickrSearchViewModel.flickrSearchUiState
             )

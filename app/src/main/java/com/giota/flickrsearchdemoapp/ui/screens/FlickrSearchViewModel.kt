@@ -4,8 +4,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
+import com.giota.flickrsearchdemoapp.FlickrSearchPhotosApplication
 import com.giota.flickrsearchdemoapp.data.DefaultFlickrSearchPhotosRepository
+import com.giota.flickrsearchdemoapp.data.FlickrSearchPhotosRepository
 import com.giota.flickrsearchdemoapp.network.FlickrSearchPhoto
 import kotlinx.coroutines.launch
 import java.io.IOException
@@ -16,7 +22,9 @@ sealed interface FlickrSearchUiState {
     object Loading : FlickrSearchUiState
 }
 
-class FlickrSearchViewModel : ViewModel() {
+class FlickrSearchViewModel(
+    private val flickrSearchPhotosRepository: FlickrSearchPhotosRepository
+) : ViewModel() {
     /** The mutable State that stores the status of the most recent request */
     var flickrSearchUiState: FlickrSearchUiState by mutableStateOf(FlickrSearchUiState.Loading)
         private set
@@ -29,13 +37,12 @@ class FlickrSearchViewModel : ViewModel() {
     }
 
     /**
-     * Gets Flickr photos information from the FlickrSearch API
+     * Gets Flickr photos information from the Repository
      */
     private fun getFlickrPhotos() {
         viewModelScope.launch {
             flickrSearchUiState = try {
-                val flickrSearchRepository = DefaultFlickrSearchPhotosRepository()
-                val response = flickrSearchRepository.getFlickrPhotos()
+                val response = flickrSearchPhotosRepository.getFlickrPhotos()
                 FlickrSearchUiState.Success(response.photos.photo)
             } catch (e: IOException) {
                 FlickrSearchUiState.Error
@@ -43,6 +50,16 @@ class FlickrSearchViewModel : ViewModel() {
 
         }
 
+    }
+
+    companion object {
+        val Factory: ViewModelProvider.Factory = viewModelFactory {
+            initializer {
+                val application = (this[APPLICATION_KEY] as FlickrSearchPhotosApplication)
+                val flickrSearchPhotosRepository = application.container.flickrSearchPhotosRepository
+                FlickrSearchViewModel(flickrSearchPhotosRepository = flickrSearchPhotosRepository)
+            }
+        }
     }
 
 }
