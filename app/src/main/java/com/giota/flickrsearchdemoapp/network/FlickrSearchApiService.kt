@@ -20,7 +20,7 @@ object FlickrSearchApi {
 
 interface FlickrSearchApiService {
     @GET("services/rest/")
-    suspend fun searchPhotos(
+    suspend fun getPhotos(
         @Query("method") method: String = "flickr.photos.search",
         @Query("api_key") apiKey: String,
         @Query("tags") tags: String,

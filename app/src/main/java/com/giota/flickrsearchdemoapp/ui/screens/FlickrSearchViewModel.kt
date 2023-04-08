@@ -5,13 +5,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.giota.flickrsearchdemoapp.network.FlickrSearchApi
-import com.giota.flickrsearchdemoapp.util.Constants.API_KEY
+import com.giota.flickrsearchdemoapp.data.DefaultFlickrSearchPhotosRepository
+import com.giota.flickrsearchdemoapp.network.FlickrSearchPhoto
 import kotlinx.coroutines.launch
 import java.io.IOException
 
 sealed interface FlickrSearchUiState {
-    data class Success(val photos: String) : FlickrSearchUiState
+    data class Success(val photos: List<FlickrSearchPhoto>) : FlickrSearchUiState
     object Error : FlickrSearchUiState
     object Loading : FlickrSearchUiState
 }
@@ -25,17 +25,18 @@ class FlickrSearchViewModel : ViewModel() {
      * Call searchFlickrPhotos() on init so we can display status immediately.
      */
     init {
-        searchFlickrPhotos()
+        getFlickrPhotos()
     }
 
     /**
      * Gets Flickr photos information from the FlickrSearch API
      */
-    private fun searchFlickrPhotos() {
+    private fun getFlickrPhotos() {
         viewModelScope.launch {
             flickrSearchUiState = try {
-                val listResult = FlickrSearchApi.retrofitService.searchPhotos(apiKey = API_KEY, tags = "cat")
-                FlickrSearchUiState.Success(listResult.photos.photo[0].toString())
+                val flickrSearchRepository = DefaultFlickrSearchPhotosRepository()
+                val response = flickrSearchRepository.getFlickrPhotos()
+                FlickrSearchUiState.Success(response.photos.photo)
             } catch (e: IOException) {
                 FlickrSearchUiState.Error
             }

@@ -6,6 +6,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.giota.flickrsearchdemoapp.network.FlickrSearchPhoto
 import com.giota.flickrsearchdemoapp.ui.FlickrSearchUiState
 
 @Composable
@@ -35,12 +36,12 @@ fun LoadingScreen(modifier: Modifier = Modifier) {
  * The home screen displaying result of fetching photos.
  */
 @Composable
-fun ResultScreen(flickrSearchUiState: String, modifier: Modifier = Modifier) {
+fun ResultScreen(flickrSearchUiState: List<FlickrSearchPhoto>, modifier: Modifier = Modifier) {
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier.fillMaxSize()
     ) {
-        Text(flickrSearchUiState)
+        Text(flickrSearchUiState.toString())
     }
 }
 
