@@ -1,4 +1,4 @@
-package com.giota.flickrsearchdemoapp.ui
+package com.giota.flickrsearchdemoapp.ui.screens
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -10,14 +10,13 @@ import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.giota.flickrsearchdemoapp.FlickrSearchPhotosApplication
-import com.giota.flickrsearchdemoapp.data.DefaultFlickrSearchPhotosRepository
 import com.giota.flickrsearchdemoapp.data.FlickrSearchPhotosRepository
-import com.giota.flickrsearchdemoapp.network.FlickrSearchPhoto
+import com.giota.flickrsearchdemoapp.network.FlickrSearchPhotos
 import kotlinx.coroutines.launch
 import java.io.IOException
 
 sealed interface FlickrSearchUiState {
-    data class Success(val photos: List<FlickrSearchPhoto>) : FlickrSearchUiState
+    data class Success(val photos: FlickrSearchPhotos) : FlickrSearchUiState
     object Error : FlickrSearchUiState
     object Loading : FlickrSearchUiState
 }
@@ -36,6 +35,10 @@ class FlickrSearchViewModel(
         getFlickrPhotos()
     }
 
+    private fun getImageUrl(photo_server: String, photo_id: String, photo_secret: String): String {
+        return "https://live.staticflickr.com/${photo_server}/${photo_id}_${photo_secret}.jpg"
+    }
+
     /**
      * Gets Flickr photos information from the Repository
      */
@@ -43,7 +46,8 @@ class FlickrSearchViewModel(
         viewModelScope.launch {
             flickrSearchUiState = try {
                 val response = flickrSearchPhotosRepository.getFlickrPhotos()
-                FlickrSearchUiState.Success(response.photos.photo)
+
+                FlickrSearchUiState.Success(response.photos)
             } catch (e: IOException) {
                 FlickrSearchUiState.Error
             }
