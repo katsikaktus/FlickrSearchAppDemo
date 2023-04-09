@@ -13,9 +13,8 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             FlickrSearchDemoAppTheme {
-                val viewModel: FlickrSearchViewModel =
-                    viewModel(factory = FlickrSearchViewModel.Factory)
-                FlickrSearchApp(viewModel)
+
+                FlickrSearchApp()
             }
         }
     }

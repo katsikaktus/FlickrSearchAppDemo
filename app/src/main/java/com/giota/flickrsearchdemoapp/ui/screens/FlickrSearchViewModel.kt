@@ -28,26 +28,23 @@ class FlickrSearchViewModel(
     var flickrSearchUiState: FlickrSearchUiState by mutableStateOf(FlickrSearchUiState.Loading)
         private set
 
-    /**
-     * Call searchFlickrPhotos() on init so we can display status immediately.
-     */
-    init {
-        getFlickrPhotos()
+    var userInput: String by mutableStateOf("")
+        private set
+
+    fun updateUserSearch(tag: String){
+        userInput = tag
     }
 
-    private fun getImageUrl(photo_server: String, photo_id: String, photo_secret: String): String {
-        return "https://live.staticflickr.com/${photo_server}/${photo_id}_${photo_secret}.jpg"
-    }
 
     /**
      * Gets Flickr photos information from the Repository
      */
-    private fun getFlickrPhotos() {
+     fun getFlickrPhotos(tag: String) {
         viewModelScope.launch {
             flickrSearchUiState = try {
-                val response = flickrSearchPhotosRepository.getFlickrPhotos()
-
+                val response = flickrSearchPhotosRepository.getFlickrPhotos(tag)
                 FlickrSearchUiState.Success(response.photos)
+
             } catch (e: IOException) {
                 FlickrSearchUiState.Error
             }

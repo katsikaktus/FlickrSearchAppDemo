@@ -15,4 +15,7 @@ data class FlickrSearchPhoto(
     val secret: String,
     val server: String,
     val title: String,
-)
+){
+    val imgUrl: String
+        get() = "https://live.staticflickr.com/$server/${id}_$secret.jpg"
+}

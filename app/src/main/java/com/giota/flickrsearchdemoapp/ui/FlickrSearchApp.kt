@@ -5,13 +5,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.giota.flickrsearchdemoapp.ui.screens.FlickrSearchViewModel
 import com.giota.flickrsearchdemoapp.ui.screens.HomeScreen
 
 
 @Composable
 fun FlickrSearchApp(
-    flickrSearchViewModel: FlickrSearchViewModel,
     modifier: Modifier = Modifier) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -22,10 +22,9 @@ fun FlickrSearchApp(
                 .padding(it),
             color = MaterialTheme.colors.background
         ) {
-            HomeScreen(
-                flickrSearchUiState = flickrSearchViewModel.flickrSearchUiState
-            )
-
+            val viewModel: FlickrSearchViewModel =
+                viewModel(factory = FlickrSearchViewModel.Factory)
+            HomeScreen(modifier, viewModel)
         }
     }
 }
