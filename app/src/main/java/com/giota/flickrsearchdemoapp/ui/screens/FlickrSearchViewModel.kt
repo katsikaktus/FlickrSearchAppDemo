@@ -1,5 +1,7 @@
 package com.giota.flickrsearchdemoapp.ui.screens
 
+
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -13,23 +15,37 @@ import com.giota.flickrsearchdemoapp.FlickrSearchPhotosApplication
 import com.giota.flickrsearchdemoapp.data.FlickrSearchPhotosRepository
 import com.giota.flickrsearchdemoapp.network.FlickrSearchPhotos
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 import java.io.IOException
+
+
+enum class FlickrSearchError {
+    NO_INTERNET_CONNECTION,
+    NO_RESULTS_FOUND,
+    UNKNOWN_ERROR
+}
 
 sealed interface FlickrSearchUiState {
     data class Success(val photos: FlickrSearchPhotos) : FlickrSearchUiState
-    object Error : FlickrSearchUiState
+    data class Error(val errorMessage: FlickrSearchError) : FlickrSearchUiState
     object Loading : FlickrSearchUiState
+    object NoRequest : FlickrSearchUiState
 }
+
+
 
 class FlickrSearchViewModel(
     private val flickrSearchPhotosRepository: FlickrSearchPhotosRepository
 ) : ViewModel() {
+
+
     /** The mutable State that stores the status of the most recent request */
-    var flickrSearchUiState: FlickrSearchUiState by mutableStateOf(FlickrSearchUiState.Loading)
+    var flickrSearchUiState: FlickrSearchUiState by mutableStateOf(FlickrSearchUiState.NoRequest)
         private set
 
     var userInput: String by mutableStateOf("")
         private set
+
 
     fun updateUserSearch(tag: String){
         userInput = tag
@@ -40,17 +56,31 @@ class FlickrSearchViewModel(
      * Gets Flickr photos information from the Repository
      */
      fun getFlickrPhotos(tag: String) {
+
         viewModelScope.launch {
-            flickrSearchUiState = try {
-                val response = flickrSearchPhotosRepository.getFlickrPhotos(tag)
-                FlickrSearchUiState.Success(response.photos)
 
-            } catch (e: IOException) {
-                FlickrSearchUiState.Error
+            if (tag.isNotEmpty()){
+                flickrSearchUiState = FlickrSearchUiState.Loading
+                flickrSearchUiState = try {
+                        val response = flickrSearchPhotosRepository.getFlickrPhotos(tag)
+                        Log.d("res", response.toString())
+
+                        if ( response.photos.photo.isNotEmpty()){
+                            FlickrSearchUiState.Success(response.photos)
+                        } else {
+                            FlickrSearchUiState.Error(FlickrSearchError.NO_RESULTS_FOUND)
+                        }
+
+                    } catch (e: IOException) {
+                        FlickrSearchUiState.Error(FlickrSearchError.NO_INTERNET_CONNECTION)
+
+                    } catch (e: HttpException) {
+                        FlickrSearchUiState.Error(FlickrSearchError.UNKNOWN_ERROR)
+                    }
+            } else {
+                FlickrSearchUiState.NoRequest
             }
-
         }
-
     }
 
     companion object {

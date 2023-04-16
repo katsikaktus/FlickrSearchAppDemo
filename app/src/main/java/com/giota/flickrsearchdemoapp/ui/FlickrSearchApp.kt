@@ -22,9 +22,12 @@ fun FlickrSearchApp(
                 .padding(it),
             color = MaterialTheme.colors.background
         ) {
-            val viewModel: FlickrSearchViewModel =
+            val flickrViewModel: FlickrSearchViewModel =
                 viewModel(factory = FlickrSearchViewModel.Factory)
-            HomeScreen(modifier, viewModel)
+            val tag = flickrViewModel.userInput
+            HomeScreen(
+                viewModel = flickrViewModel,
+                modifier = Modifier)
         }
     }
 }

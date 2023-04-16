@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">FlickrSearchDemoApp</string>
+    <string name="loading_failed">Failed to load</string>
+    <string name="retry">Retry</string>
+    <string name="loading">Loading</string>
+    <string name="welcome_prompt">Welcome to Flickr Search!</string>
+    <string name="no_photos_found"> "No photos found for the given tag"</string>
+    <string name="unknown_error_try_later"> "An error occurred while fetching data.\nPlease try again later."</string>
+    <string name="internet_error_prompt"> "An error occurred while fetching data.\nPlease check your internet connection."</string>
 </resources>

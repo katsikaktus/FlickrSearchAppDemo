@@ -11,6 +11,7 @@ interface FlickrSearchApiService {
         @Query("method") method: String = "flickr.photos.search",
         @Query("api_key") apiKey: String,
         @Query("tags") tags: String,
+        @Query("sort") sort: String = "relevance",
         @Query("format") format: String = "json",
         @Query("nojsoncallback") noJsonCallback: Int = 1
     ): FlickrSearchResponse
