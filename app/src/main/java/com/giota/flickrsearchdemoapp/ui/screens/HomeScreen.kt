@@ -45,20 +45,34 @@ fun HomeScreen(
     ) {
 
         val searchTag = viewModel.userInput
+        val selectedPhoto = viewModel.selectedPhoto
 
-        SearchField(
-            value = searchTag,
-            onUserInputChanged = {viewModel.updateUserSearch(it)},
-            onKeyboardSearch = { viewModel.getFlickrPhotos(searchTag) },
-            onSearchButtonClicked = { viewModel.getFlickrPhotos(searchTag) },
-        )
-        Spacer(Modifier.height(8.dp))
-        when(viewModel.flickrSearchUiState){
-            is FlickrSearchUiState.Loading -> LoadingScreen(modifier)
-            is FlickrSearchUiState.Success -> PhotosGridScreen((viewModel.flickrSearchUiState as FlickrSearchUiState.Success).photos.photo, modifier)
-            is FlickrSearchUiState.Error -> ErrorScreen((viewModel.flickrSearchUiState as FlickrSearchUiState.Error).errorMessage, modifier)
-            is FlickrSearchUiState.NoRequest -> EmptyScreen(modifier)
+        if (selectedPhoto != null) {
+            PhotoDetailsScreen(
+                photo = selectedPhoto,
+                onBackPressed = { viewModel.clearSelectedPhoto() }
+            )
+        } else {
+            SearchField(
+                value = searchTag,
+                onUserInputChanged = {viewModel.updateUserSearch(it)},
+                onKeyboardSearch = { viewModel.getFlickrPhotos(searchTag) },
+                onSearchButtonClicked = { viewModel.getFlickrPhotos(searchTag) },
+            )
+            Spacer(Modifier.height(8.dp))
+
+            when(viewModel.flickrSearchUiState){
+                is FlickrSearchUiState.Loading -> LoadingScreen(modifier)
+                is FlickrSearchUiState.Success -> PhotosGridScreen(
+                    (viewModel.flickrSearchUiState as FlickrSearchUiState.Success).photos.photo,
+                    onPhotoClicked = { viewModel.selectPhoto(it) },
+                    modifier)
+                is FlickrSearchUiState.Error -> ErrorScreen((viewModel.flickrSearchUiState as FlickrSearchUiState.Error).errorMessage, modifier)
+                is FlickrSearchUiState.NoRequest -> EmptyScreen(modifier)
+            }
         }
+
+
     }
 
 }
@@ -120,14 +134,19 @@ fun EmptyScreen(modifier: Modifier = Modifier) {
 
 
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun FlickrSearchPhotoCard(photo: FlickrSearchPhoto, modifier: Modifier = Modifier) {
+fun FlickrSearchPhotoCard(
+    photo: FlickrSearchPhoto,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier) {
     Card(
         modifier = modifier
             .padding(4.dp)
             .fillMaxWidth()
             .aspectRatio(1f),
         elevation = 8.dp,
+        onClick = onClick
     ) {
         AsyncImage(
             model = ImageRequest.Builder(context = LocalContext.current)
@@ -138,21 +157,26 @@ fun FlickrSearchPhotoCard(photo: FlickrSearchPhoto, modifier: Modifier = Modifie
             contentDescription = null,
             error = painterResource(R.drawable.ic_broken_image),
             placeholder = painterResource(R.drawable.loading_img),
-            contentScale = ContentScale.Crop
+            contentScale = ContentScale.Crop,
         )
     }
 
 }
 
 @Composable
-fun PhotosGridScreen(photos: List<FlickrSearchPhoto>, modifier: Modifier = Modifier) {
+fun PhotosGridScreen(
+    photos: List<FlickrSearchPhoto>,
+    onPhotoClicked: (FlickrSearchPhoto) -> Unit,
+    modifier: Modifier = Modifier) {
     LazyVerticalGrid(
         columns = GridCells.Adaptive(150.dp),
         modifier = modifier.fillMaxWidth(),
         contentPadding = PaddingValues(4.dp)
     ) {
         items(items = photos, key = { photo -> photo.id }) { photo ->
-            FlickrSearchPhotoCard(photo)
+            FlickrSearchPhotoCard(
+                photo = photo,
+                onClick = { onPhotoClicked(photo) })
         }
     }
 }
@@ -218,11 +242,7 @@ fun SearchField(
                 }
 
             }
-
-
         }
     }
-
-
 }
 

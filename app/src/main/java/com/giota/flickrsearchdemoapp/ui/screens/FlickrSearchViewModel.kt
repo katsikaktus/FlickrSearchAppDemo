@@ -13,6 +13,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.giota.flickrsearchdemoapp.FlickrSearchPhotosApplication
 import com.giota.flickrsearchdemoapp.data.FlickrSearchPhotosRepository
+import com.giota.flickrsearchdemoapp.network.FlickrSearchPhoto
 import com.giota.flickrsearchdemoapp.network.FlickrSearchPhotos
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -46,10 +47,26 @@ class FlickrSearchViewModel(
     var userInput: String by mutableStateOf("")
         private set
 
-
     fun updateUserSearch(tag: String){
         userInput = tag
     }
+
+
+    /** The selected photo */
+    var selectedPhoto by mutableStateOf<FlickrSearchPhoto?>(null)
+        private set
+
+    /** Sets the selected photo */
+    fun selectPhoto(photo: FlickrSearchPhoto) {
+        selectedPhoto = photo
+    }
+
+    /** Clears the selected photo */
+    fun clearSelectedPhoto() {
+        selectedPhoto = null
+    }
+
+
 
 
     /**
