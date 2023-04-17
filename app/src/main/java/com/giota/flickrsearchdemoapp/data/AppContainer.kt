@@ -1,7 +1,6 @@
 package com.giota.flickrsearchdemoapp.data
 
 import com.giota.flickrsearchdemoapp.network.FlickrSearchApiService
-import com.giota.flickrsearchdemoapp.util.Constants
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 

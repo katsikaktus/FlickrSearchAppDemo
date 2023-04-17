@@ -21,11 +21,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import coil.annotation.ExperimentalCoilApi
 import coil.compose.AsyncImage
 import coil.request.CachePolicy
@@ -62,7 +61,6 @@ fun SearchScreen(
                 onPhotoClicked = { viewModel.selectPhoto(it)},
                 modifier)
             is FlickrSearchUiState.Error -> ErrorScreen(
-                searchTag,
                 (viewModel.flickrSearchUiState as FlickrSearchUiState.Error).errorMessage,
                 modifier)
         }
@@ -80,8 +78,7 @@ fun WelcomeScreen(modifier: Modifier = Modifier) {
     ) {
         Text(
             stringResource(R.string.welcome_prompt),
-            fontWeight = FontWeight.Bold,
-            fontSize = 20.sp
+            style = MaterialTheme.typography.h1
         )
     }
 }
@@ -101,10 +98,8 @@ fun LoadingScreen(modifier: Modifier = Modifier) {
     }
 }
 
-@OptIn(ExperimentalCoilApi::class)
 @Composable
 fun ErrorScreen(
-    searchTag: String,
     error: FlickrSearchError,
     modifier: Modifier = Modifier) {
     Column(
@@ -122,15 +117,12 @@ fun ErrorScreen(
 
 
         Text(
-            errorMessage,
-            fontWeight = FontWeight.Bold,
-            fontSize = 20.sp
+            text = errorMessage,
+            style = MaterialTheme.typography.h1,
+            textAlign = TextAlign.Center
         )
     }
 }
-
-
-
 
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalCoilApi::class)
@@ -209,7 +201,10 @@ fun SearchField(
                 value = value,
                 singleLine = true,
                 onValueChange = onUserInputChanged,
-                label = { Text(stringResource(R.string.search_prompt))},
+                label = { Text(
+                    text = stringResource(R.string.search_prompt),
+                    style = MaterialTheme.typography.body1,
+                )},
                 keyboardOptions = KeyboardOptions.Default.copy(
                     keyboardType = KeyboardType.Text,
                     imeAction = ImeAction.Search
@@ -220,6 +215,7 @@ fun SearchField(
                         focusManager.clearFocus()
                     }
                 ),
+
                 modifier = Modifier
                     .fillMaxWidth(0.8f)
                     .padding(4.dp)
@@ -238,7 +234,7 @@ fun SearchField(
                         focusManager.clearFocus() },
                     modifier = Modifier
                         .size(48.dp)
-                        .background(Color.Magenta)
+                        .background(MaterialTheme.colors.primary)
                         .align(Alignment.CenterVertically)
                 ) {
                     Icon(

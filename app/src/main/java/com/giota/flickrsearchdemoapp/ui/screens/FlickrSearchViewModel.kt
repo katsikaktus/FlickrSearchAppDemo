@@ -37,7 +37,6 @@ sealed interface FlickrSearchUiState {
 sealed interface PhotoInfoUiState {
     data class Success(val photo: Photo) : PhotoInfoUiState
     data class Error(val errorMessage: FlickrSearchError) : PhotoInfoUiState
-    object Loading : PhotoInfoUiState
     object NoRequest : PhotoInfoUiState
 }
 
@@ -53,6 +52,8 @@ class FlickrSearchViewModel(
 
     var photoInfoUiState: PhotoInfoUiState by mutableStateOf(PhotoInfoUiState.NoRequest)
         private set
+
+
 
 
     var userInput: String by mutableStateOf("")
@@ -74,9 +75,8 @@ class FlickrSearchViewModel(
     /** Clears the selected photo */
     fun clearSelectedPhoto() {
         selectedPhoto = null
+        photoInfoUiState = PhotoInfoUiState.NoRequest
     }
-
-
 
     /**
      * Gets Flickr photos information from the Repository
@@ -89,7 +89,7 @@ class FlickrSearchViewModel(
                 flickrSearchUiState = FlickrSearchUiState.Loading
                 flickrSearchUiState = try {
                         val response = flickrSearchPhotosRepository.getFlickrPhotos(tag)
-                        Log.d("res", response.toString())
+                        Log.d("getFlickrPhotos", response.toString())
 
                         if ( response.photos.photo.isNotEmpty()){
                             FlickrSearchUiState.Success(response.photos)
@@ -111,10 +111,9 @@ class FlickrSearchViewModel(
 
     fun getPhotoInfo(photoId: String, photoSecret: String){
         viewModelScope.launch {
-            photoInfoUiState = PhotoInfoUiState.Loading
             photoInfoUiState = try {
                 val response = flickrSearchPhotosRepository.getFlickrPhotoInfo(photoId, photoSecret)
-                Log.d("res", response.toString())
+                Log.d("getPhotoInfo", response.toString())
 
                 PhotoInfoUiState.Success(response.photo)
 

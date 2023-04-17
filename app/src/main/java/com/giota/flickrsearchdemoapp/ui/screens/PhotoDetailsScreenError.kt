@@ -3,9 +3,7 @@ package com.giota.flickrsearchdemoapp.ui.screens
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -16,22 +14,17 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.giota.flickrsearchdemoapp.R
 
-
-
 @Composable
-fun PhotoDetailsScreen(
+fun PhotoDetailsScreenError(
     imgUrl: String,
     title: String,
-    username: String,
-    description: String,
-    dateUploaded: String,
-    views: Int,
     modifier: Modifier = Modifier,
     onBackPressed: () -> Unit = {}
 ) {
@@ -66,96 +59,24 @@ fun PhotoDetailsScreen(
             Spacer(modifier = Modifier.width(16.dp))
             Text(text = title, style = MaterialTheme.typography.h2)
         }
-        FlickrSearchPhotoCard(
+        PhotoCard(
             imgUrl,
             modifier = modifier
         )
-        Spacer(Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = stringResource(R.string.internet_error_prompt),
+            style = MaterialTheme.typography.h2,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(16.dp))
 
-        PhotoDetails(
-            username,
-            description,
-            dateUploaded,
-            views,
-            modifier = modifier)
+
     }
+
 }
 
 @Composable
-private fun PhotoDetails (
-    username: String,
-    description: String,
-    dateUploaded: String,
-    views: Int,
-    modifier: Modifier
-){
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(4.dp)
-
-    ){
-        Card(
-            modifier = Modifier,
-            shape = MaterialTheme.shapes.small
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(MaterialTheme.colors.primaryVariant)
-                    .padding(vertical = 4.dp, horizontal = 8.dp),
-                verticalArrangement = Arrangement.SpaceEvenly
-            ) {
-                Row(modifier = modifier) {
-                    Text(
-                        text ="Username: ",
-                        style = MaterialTheme.typography.h2)
-                    Text(
-                        text = username,
-                        style = MaterialTheme.typography.body1)
-                }
-                Row(modifier = modifier) {
-                    Text(
-                        text = "Uploaded date: ",
-                        style = MaterialTheme.typography.h2)
-                    Text(text = dateUploaded,
-                        style = MaterialTheme.typography.body1)
-
-                }
-                Row(modifier = modifier) {
-                    Text(
-                        text ="Views: ",
-                        style = MaterialTheme.typography.h2)
-                    Text(
-                        text = views.toString(),
-                        style = MaterialTheme.typography.body1)
-                }
-
-            }
-
-        }
-
-        Column(
-            modifier = Modifier
-                .padding(vertical = 4.dp, horizontal = 8.dp)
-                .background(MaterialTheme.colors.background)
-                .verticalScroll(rememberScrollState())) {
-            Row(modifier = modifier) {
-                Text(
-                    text = "Description: ",
-                    style = MaterialTheme.typography.h2)
-                Text(
-                    text = description,
-                    style = MaterialTheme.typography.body1)
-            }
-        }
-
-    }
-}
-
-
-@Composable
-fun FlickrSearchPhotoCard(
+fun PhotoCard(
     imgUrl: String,
     modifier: Modifier = Modifier) {
     Card(
