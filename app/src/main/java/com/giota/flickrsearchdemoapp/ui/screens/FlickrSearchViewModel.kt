@@ -15,6 +15,7 @@ import com.giota.flickrsearchdemoapp.FlickrSearchPhotosApplication
 import com.giota.flickrsearchdemoapp.data.FlickrSearchPhotosRepository
 import com.giota.flickrsearchdemoapp.network.FlickrSearchPhoto
 import com.giota.flickrsearchdemoapp.network.FlickrSearchPhotos
+import com.giota.flickrsearchdemoapp.network.Photo
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
@@ -33,16 +34,26 @@ sealed interface FlickrSearchUiState {
     object NoRequest : FlickrSearchUiState
 }
 
+sealed interface PhotoInfoUiState {
+    data class Success(val photo: Photo) : PhotoInfoUiState
+    data class Error(val errorMessage: FlickrSearchError) : PhotoInfoUiState
+    object Loading : PhotoInfoUiState
+    object NoRequest : PhotoInfoUiState
+}
+
 
 
 class FlickrSearchViewModel(
     private val flickrSearchPhotosRepository: FlickrSearchPhotosRepository
 ) : ViewModel() {
 
-
     /** The mutable State that stores the status of the most recent request */
     var flickrSearchUiState: FlickrSearchUiState by mutableStateOf(FlickrSearchUiState.NoRequest)
         private set
+
+    var photoInfoUiState: PhotoInfoUiState by mutableStateOf(PhotoInfoUiState.NoRequest)
+        private set
+
 
     var userInput: String by mutableStateOf("")
         private set
@@ -50,7 +61,6 @@ class FlickrSearchViewModel(
     fun updateUserSearch(tag: String){
         userInput = tag
     }
-
 
     /** The selected photo */
     var selectedPhoto by mutableStateOf<FlickrSearchPhoto?>(null)
@@ -65,7 +75,6 @@ class FlickrSearchViewModel(
     fun clearSelectedPhoto() {
         selectedPhoto = null
     }
-
 
 
 
@@ -98,6 +107,27 @@ class FlickrSearchViewModel(
                 FlickrSearchUiState.NoRequest
             }
         }
+    }
+
+    fun getPhotoInfo(photoId: String, photoSecret: String){
+        viewModelScope.launch {
+            photoInfoUiState = PhotoInfoUiState.Loading
+            photoInfoUiState = try {
+                val response = flickrSearchPhotosRepository.getFlickrPhotoInfo(photoId, photoSecret)
+                Log.d("res", response.toString())
+
+                PhotoInfoUiState.Success(response.photo)
+
+            } catch (e: IOException) {
+                PhotoInfoUiState.Error(FlickrSearchError.NO_INTERNET_CONNECTION)
+
+            } catch (e: HttpException) {
+                PhotoInfoUiState.Error(FlickrSearchError.UNKNOWN_ERROR)
+            }
+
+
+        }
+
     }
 
     companion object {

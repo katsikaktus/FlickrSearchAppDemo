@@ -1,37 +1,37 @@
 package com.giota.flickrsearchdemoapp.ui.screens
 
+import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.giota.flickrsearchdemoapp.network.FlickrSearchPhoto
-
+import com.giota.flickrsearchdemoapp.network.Photo
 
 
 @Composable
 fun PhotoDetailsScreen(
-    photo: FlickrSearchPhoto,
+    photo: Photo,
     modifier: Modifier = Modifier,
     onBackPressed: () -> Unit = {}
 ) {
     BackHandler {
         onBackPressed()
     }
+    Log.d("photo_details", photo.dateuploaded)
+    PhotoDetails(
+        photo.dateuploaded,
+        photo.owner.username,
+        modifier = modifier)
 
-    Column (modifier = modifier.fillMaxSize()){
-        PhotoDetails(title = photo.title, owner = photo.owner, modifier = modifier)
-
-    }
 }
 
 @Composable
 private fun PhotoDetails (
-    title: String,
+    date: String,
     owner: String,
     modifier: Modifier
 ){
@@ -40,7 +40,7 @@ private fun PhotoDetails (
             .fillMaxWidth()
             .padding(20.dp)
     ){
-        Text(text = title)
-        Text(text = owner)
+        Text(date)
+        Text(owner)
     }
 }
