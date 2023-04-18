@@ -21,6 +21,8 @@ import coil.request.CachePolicy
 import coil.request.ImageRequest
 import com.giota.flickrsearchdemoapp.R
 
+
+/** Show the cached picture with an error message */
 @Composable
 fun PhotoDetailsScreenError(
     imgUrl: String,

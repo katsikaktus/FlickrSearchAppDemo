@@ -20,13 +20,14 @@ import kotlinx.coroutines.launch
 import retrofit2.HttpException
 import java.io.IOException
 
-
+/** Define an enum class for possible error types during api calls */
 enum class FlickrSearchError {
     NO_INTERNET_CONNECTION,
     NO_RESULTS_FOUND,
     UNKNOWN_ERROR
 }
 
+/** Define an interface for the UI state for the flickr search*/
 sealed interface FlickrSearchUiState {
     data class Success(val photos: FlickrSearchPhotos) : FlickrSearchUiState
     data class Error(val errorMessage: FlickrSearchError) : FlickrSearchUiState
@@ -34,6 +35,7 @@ sealed interface FlickrSearchUiState {
     object NoRequest : FlickrSearchUiState
 }
 
+/**  Define an interface for the UI state of photo information */
 sealed interface PhotoInfoUiState {
     data class Success(val photo: Photo) : PhotoInfoUiState
     data class Error(val errorMessage: FlickrSearchError) : PhotoInfoUiState
@@ -41,24 +43,25 @@ sealed interface PhotoInfoUiState {
 }
 
 
-
+/**  Define the ViewModel class of the app */
 class FlickrSearchViewModel(
     private val flickrSearchPhotosRepository: FlickrSearchPhotosRepository
 ) : ViewModel() {
 
-    /** The mutable State that stores the status of the most recent request */
+    /** The mutable State that stores the status of the most recent search request */
     var flickrSearchUiState: FlickrSearchUiState by mutableStateOf(FlickrSearchUiState.NoRequest)
         private set
 
+    /** The mutable State that stores the status of the most recent get photo info request */
     var photoInfoUiState: PhotoInfoUiState by mutableStateOf(PhotoInfoUiState.NoRequest)
         private set
 
-
-
-
+    /** The mutable State that stores the status of the user input for the search bar */
     var userInput: String by mutableStateOf("")
         private set
 
+
+    /** The mutable State that stores the status of the most recent search request */
     fun updateUserSearch(tag: String){
         userInput = tag
     }
@@ -78,9 +81,7 @@ class FlickrSearchViewModel(
         photoInfoUiState = PhotoInfoUiState.NoRequest
     }
 
-    /**
-     * Gets Flickr photos information from the Repository
-     */
+    /** Gets Flickr photos from the Repository*/
      fun getFlickrPhotos(tag: String) {
 
         viewModelScope.launch {
@@ -89,8 +90,8 @@ class FlickrSearchViewModel(
                 flickrSearchUiState = FlickrSearchUiState.Loading
                 flickrSearchUiState = try {
                         val response = flickrSearchPhotosRepository.getFlickrPhotos(tag)
-                        Log.d("getFlickrPhotos", response.toString())
 
+                         // Check if there are search results
                         if ( response.photos.photo.isNotEmpty()){
                             FlickrSearchUiState.Success(response.photos)
                         } else {
@@ -109,11 +110,11 @@ class FlickrSearchViewModel(
         }
     }
 
+    /** Gets information for a specific photo from the Repository*/
     fun getPhotoInfo(photoId: String, photoSecret: String){
         viewModelScope.launch {
             photoInfoUiState = try {
                 val response = flickrSearchPhotosRepository.getFlickrPhotoInfo(photoId, photoSecret)
-                Log.d("getPhotoInfo", response.toString())
 
                 PhotoInfoUiState.Success(response.photo)
 
@@ -128,6 +129,8 @@ class FlickrSearchViewModel(
         }
 
     }
+    /** This is a companion object that contains a Factory property that creates an instance of the
+     * FlickrSearchViewModel with the FlickrSearchPhotosRepository dependency injected.*/
 
     companion object {
         val Factory: ViewModelProvider.Factory = viewModelFactory {

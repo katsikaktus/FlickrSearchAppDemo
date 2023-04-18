@@ -25,14 +25,20 @@ fun FlickrSearchApp(
                 .padding(it),
             color = MaterialTheme.colors.background
         ) {
+
+            /** Obtain an instance of FlickrSearchViewModel */
             val flickrViewModel: FlickrSearchViewModel =
                 viewModel(factory = FlickrSearchViewModel.Factory)
 
-
+            /** The selected photo property is used for the navigation in the app. If there is
+             * a photo selected then the app displays the details of that photo. Otherwise, the app
+             * displays the SearchScreen*/
             val selectedPhoto = flickrViewModel.selectedPhoto
 
             if (selectedPhoto != null) {
 
+                /** The arguments passed to the details screen depend on the status of the getInfo
+                 * API call*/
                 when(flickrViewModel.photoInfoUiState){
                     is PhotoInfoUiState.NoRequest -> {
                         flickrViewModel.getPhotoInfo(
@@ -56,8 +62,8 @@ fun FlickrSearchApp(
 
                 }
 
-
             } else {
+                /** Here the whole model is passed to the Search Screen */
                 SearchScreen(
                     viewModel = flickrViewModel,
                     modifier = Modifier

@@ -52,17 +52,18 @@ fun SearchScreen(
         )
         Spacer(Modifier.height(8.dp))
 
+        /** Checking the status of the API call and displaying different composable*/
         when(viewModel.flickrSearchUiState){
             is FlickrSearchUiState.NoRequest -> WelcomeScreen(modifier)
             is FlickrSearchUiState.Loading -> LoadingScreen(modifier)
             is FlickrSearchUiState.Success -> PhotosGridScreen(
-                searchTag,
-                (viewModel.flickrSearchUiState as FlickrSearchUiState.Success).photos.photo,
+                tag = searchTag,
+                photos = (viewModel.flickrSearchUiState as FlickrSearchUiState.Success).photos.photo,
                 onPhotoClicked = { viewModel.selectPhoto(it)},
-                modifier)
+                modifier = modifier)
             is FlickrSearchUiState.Error -> ErrorScreen(
-                (viewModel.flickrSearchUiState as FlickrSearchUiState.Error).errorMessage,
-                modifier)
+                error = (viewModel.flickrSearchUiState as FlickrSearchUiState.Error).errorMessage,
+                modifier = modifier)
         }
     }
 }
